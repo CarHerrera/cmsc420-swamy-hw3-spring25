@@ -1,10 +1,65 @@
 import java.lang.String;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Random;
+class Node{
+    String id;
+    int prioLvl;
+    String[] dependencies;
+    public Node(String id, int priority, String[] dependencies){
+        this.id = id;
+        this.prioLvl = priority;
+        this.dependencies = dependencies;
+    }
+}
+class Heap{
+    ArrayList<Node> heapList;
+    public Heap(){
+        heapList = new ArrayList<Node>();
+    }
 
+    public void addNode(Node n){
+        int count = heapList.size();
+        if (count == 0){
+            heapList.add(n);
+        } else {
+            heapList.add(n);
+            for(int i = (count/2)-1; i >= 0; i--){
+                heapify(i);
+            }
+        }
+    }
+    public void heapify(int i ){
+        int size = heapList.size();
+        int last = i;
+        int l = 2 * i + 1;
+        int r = 2 * i + 2;
+        if(l < size && heapList.get(l).prioLvl > heapList.get(last).prioLvl){
+            last = l;
+        }
+        if(r < size && heapList.get(r).prioLvl > heapList.get(last).prioLvl){
+            last = r;
+        }
+
+        if (last != i){
+            Node temp = heapList.get(last);
+            heapList.set(last, heapList.get(i));
+            heapList.set(i, temp);
+            heapify(last);
+        }
+    }
+}
+ class Queue{
+    public Queue(){
+
+    }
+}
 /**
  * TaskPrioritizer class that returns the most urgent
  * available task
  *
- * @author <Your Name goes here>
+ * @author Carlos Herrera
  */
 public class TaskPrioritizer {
     /**
