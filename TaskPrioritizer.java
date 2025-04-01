@@ -1,60 +1,5 @@
 import java.lang.String;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Random;
-class Node{
-    String id;
-    int prioLvl;
-    String[] dependencies;
-    public Node(String id, int priority, String[] dependencies){
-        this.id = id;
-        this.prioLvl = priority;
-        this.dependencies = dependencies;
-    }
-}
-class Heap{
-    ArrayList<Node> heapList;
-    public Heap(){
-        heapList = new ArrayList<Node>();
-    }
-
-    public void addNode(Node n){
-        int count = heapList.size();
-        if (count == 0){
-            heapList.add(n);
-        } else {
-            heapList.add(n);
-            for(int i = (count/2)-1; i >= 0; i--){
-                heapify(i);
-            }
-        }
-    }
-    public void heapify(int i ){
-        int size = heapList.size();
-        int last = i;
-        int l = 2 * i + 1;
-        int r = 2 * i + 2;
-        if(l < size && heapList.get(l).prioLvl > heapList.get(last).prioLvl){
-            last = l;
-        }
-        if(r < size && heapList.get(r).prioLvl > heapList.get(last).prioLvl){
-            last = r;
-        }
-
-        if (last != i){
-            Node temp = heapList.get(last);
-            heapList.set(last, heapList.get(i));
-            heapList.set(i, temp);
-            heapify(last);
-        }
-    }
-}
- class Queue{
-    public Queue(){
-
-    }
-}
 /**
  * TaskPrioritizer class that returns the most urgent
  * available task
@@ -65,8 +10,16 @@ public class TaskPrioritizer {
     /**
      * Constructor to initialize the TaskPrioritizer
      */
+    LeftistHeap queue;
+    HashMap hasDependecies;
+    HashMap allNodes;
     public TaskPrioritizer() {
-
+        // The queue with no dependencies
+        queue = new LeftistHeap();
+        // Hash map that has all the nodes with dependencies
+        hasDependecies = new HashMap(11939);
+        // Hash map to easily find nodes
+        allNodes = new HashMap(11939);
     }
 
     /**
@@ -78,6 +31,16 @@ public class TaskPrioritizer {
      */
     public void add(String taskId, int urgencyLevel, String[] dependencies) {
         // TODO
+        Node n = new Node(taskId, urgencyLevel, dependencies);
+        if(dependencies.length == 0){
+            queue.insert(n);
+        } else{
+            // Has dependenceis so add into HashMap.
+            for(String s: dependencies){
+                hasDependecies.add(s, n);
+            }
+        }
+        allNodes.add(taskId, n);
     }
 
     /**
@@ -89,6 +52,17 @@ public class TaskPrioritizer {
      */
     public void update(String taskId, int newUrgencyLevel) {
         // TODO
+        LinkedList<Node> vals = allNodes.getValues(taskId);
+        Node found;
+        for(Node n: vals){
+            if(n.id.equals(taskId)){
+                found = n;
+            }
+        }
+        // Update its placement in the heap??
+        //
+        queue.remove(found); 
+
     }
 
     /**
@@ -100,6 +74,8 @@ public class TaskPrioritizer {
      */
     public String resolve() {
         // TODO
-        return null;
+        Node max = queue.extractMin();
+        if (max == null) return null;
+        return max.id;
     }
 }
