@@ -16,10 +16,12 @@ public class TaskPrioritizer {
     public TaskPrioritizer() {
         // The queue with no dependencies
         queue = new LeftistHeap();
+        int size = 10;
+        // int size = 11939;
         // Hash map that has all the nodes with dependencies
-        hasDependecies = new HashMap(11939);
+        hasDependecies = new HashMap(size);
         // Hash map to easily find nodes
-        allNodes = new HashMap(11939);
+        allNodes = new HashMap(size);
     }
 
     /**
@@ -53,7 +55,7 @@ public class TaskPrioritizer {
     public void update(String taskId, int newUrgencyLevel) {
         // TODO
         LinkedList<Node> vals = allNodes.getValues(taskId);
-        Node found;
+        Node found = null;
         for(Node n: vals){
             if(n.id.equals(taskId)){
                 found = n;
@@ -61,7 +63,8 @@ public class TaskPrioritizer {
         }
         // Update its placement in the heap??
         //
-        queue.remove(found); 
+        if (found != null)
+            queue.delete(found); 
 
     }
 
@@ -76,6 +79,16 @@ public class TaskPrioritizer {
         // TODO
         Node max = queue.extractMin();
         if (max == null) return null;
+        LinkedList<Node> dep = hasDependecies.getValues(max.id);
+        if (dep != null){
+            for(Node n: dep){
+                if(n.dependencies.remove(max.id)){
+                    if(n.dependencies.size() == 0) queue.insert(n);
+                    hasDependecies.remove(max.id, n);
+                }
+            }
+        }   
+
         return max.id;
     }
 }

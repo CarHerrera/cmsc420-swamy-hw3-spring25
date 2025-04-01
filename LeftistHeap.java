@@ -1,14 +1,16 @@
+import java.util.ArrayList;
+import java.util.Arrays;
 class Node{
     String id;
     public int prioLvl;
     int npl;
-    String[] dependencies;
+    ArrayList<String> dependencies;
     Node left, right;
     public Node(String id, int priority, String[] dependencies){
         this.id = id;
         // Negative so that the largest value is at the top
         this.prioLvl = -priority;
-        this.dependencies = dependencies;
+        this.dependencies = new ArrayList<String>(Arrays.asList(dependencies));
     }
     public void setPriorityLevel(int i){
         this.prioLvl = -1 * i;
