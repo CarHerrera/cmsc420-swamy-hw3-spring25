@@ -1,5 +1,6 @@
 import java.lang.String;
-import java.util.LinkedList;
+
+
 /**
  * TaskPrioritizer class that returns the most urgent
  * available task
@@ -33,7 +34,7 @@ public class TaskPrioritizer {
      */
     public void add(String taskId, int urgencyLevel, String[] dependencies) {
         // TODO
-        Node n = new Node(taskId, urgencyLevel, dependencies);
+        Task n = new Task(taskId, urgencyLevel, dependencies);
         if(dependencies.length == 0){
             queue.insert(n);
         } else{
@@ -54,17 +55,17 @@ public class TaskPrioritizer {
      */
     public void update(String taskId, int newUrgencyLevel) {
         // TODO
-        LinkedList<Node> vals = allNodes.getValues(taskId);
-        Node found = null;
-        for(Node n: vals){
-            if(n.id.equals(taskId)){
-                found = n;
-            }
-        }
-        // Update its placement in the heap??
-        //
-        if (found != null)
-            queue.delete(found); 
+        // LinkedList vals = allNodes.getValues(taskId);
+        // Task found = null;
+        // for(Task n: vals){
+        //     if(n.id.equals(taskId)){
+        //         found = n;
+        //     }
+        // }
+        // // Update its placement in the heap??
+        // //
+        // if (found != null)
+        //     queue.delete(found); 
 
     }
 
@@ -77,15 +78,18 @@ public class TaskPrioritizer {
      */
     public String resolve() {
         // TODO
-        Node max = queue.extractMin();
+        Task max = queue.extractMin();
         if (max == null) return null;
-        LinkedList<Node> dep = hasDependecies.getValues(max.id);
+        LinkedList dep = hasDependecies.getValues(max.id);
         if (dep != null){
-            for(Node n: dep){
-                if(n.dependencies.remove(max.id)){
-                    if(n.dependencies.size() == 0) queue.insert(n);
-                    hasDependecies.remove(max.id, n);
+            Node curr = dep.head;
+            while(curr != null){
+                Node next = curr.next;
+                if(curr.data.dependencies.remove(max.id)){
+                    if(curr.data.dependencies.size() == 0) queue.insert(curr.data);
+                    dep.remove(curr);
                 }
+                curr = next;
             }
         }   
 
