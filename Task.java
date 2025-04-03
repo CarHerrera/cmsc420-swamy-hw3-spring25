@@ -8,6 +8,7 @@ public class Task {
     int npl;
     ArrayList<String> dependencies;
     Task left, right;
+    boolean resolved;
     public Task(String id, int priority, String[] dependencies){
         this.id = id;
         // Negative so that the largest value is at the top
@@ -17,6 +18,7 @@ public class Task {
         for(String s : dependencies){
             this.dependencies.add(s);
         }
+        this.resolved = false;
     }
     public void setPriorityLevel(int i){
         this.prioLvl = -1 * i;

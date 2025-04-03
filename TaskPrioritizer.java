@@ -17,8 +17,8 @@ public class TaskPrioritizer {
     public TaskPrioritizer() {
         // The queue with no dependencies
         queue = new LeftistHeap();
-        int size = 10;
-        // int size = 11939;
+        // int size = 10;
+        int size = 11939;
         // Hash map that has all the nodes with dependencies
         hasDependecies = new HashMap(size);
         // Hash map to easily find nodes
@@ -35,12 +35,31 @@ public class TaskPrioritizer {
     public void add(String taskId, int urgencyLevel, String[] dependencies) {
         // TODO
         Task n = new Task(taskId, urgencyLevel, dependencies);
+        
         if(dependencies.length == 0){
             queue.insert(n);
         } else{
             // Has dependenceis so add into HashMap.
             for(String s: dependencies){
-                hasDependecies.add(s, n);
+                LinkedList task = allNodes.getValues(s);
+                // Check to see if the task has already been resolved
+                Node curr = task.head;
+                while(curr != null){
+                    Node next = curr.next;
+                    if(curr.data.id.equals(s)){
+                        // Found the node in the bucket Now to check if resolved
+                        if(!curr.data.resolved){
+                            hasDependecies.add(s, n);
+                        } else {
+                            // resolved, no need to look further in this bucket
+                            n.dependencies.remove(s);
+                            if (n.dependencies.size()==0) queue.insert(n);
+                            break;
+                        }
+                    }
+                curr = next;
+            }
+                
             }
         }
         allNodes.add(taskId, n);
@@ -92,7 +111,7 @@ public class TaskPrioritizer {
                 curr = next;
             }
         }   
-
+        max.resolved = true;
         return max.id;
     }
 }
