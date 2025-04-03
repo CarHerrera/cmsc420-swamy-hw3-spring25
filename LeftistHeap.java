@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 public class LeftistHeap {
     private Task root;
 
@@ -44,6 +43,7 @@ public class LeftistHeap {
     }
     public void delete(Task n){
         this.root = deleteHelper(this.root, n);
+        n.npl = 0;
     }
 
     public Task deleteHelper(Task r, Task n){
@@ -55,22 +55,22 @@ public class LeftistHeap {
         r.right = deleteHelper(r.right, n);
         return r;
     }
-    public static void main(String[] args){
-        String[] dep = new String[1];
-        dep[0] = "T1";
-        Task n1 = new Task("T1", 10, null);
-        Task n2 = new Task("T2", 10, dep);
-        Task n3 = new Task("T3", 10, null);
-        Task n4 = new Task("T4", 10, null);
-        LeftistHeap heap = new LeftistHeap();
-        heap.insert(n1);
-        heap.insert(n3);
-        // heap.insert(n4);
-        heap.insert(n2);
-        Task n5 = heap.extractMin();
-        Task n6 = heap.extractMin();
-        Task n7 = heap.extractMin();
-    }   
+    // public static void main(String[] args){
+    //     String[] dep = new String[1];
+    //     dep[0] = "T1";
+    //     Task n1 = new Task("T1", 10, null);
+    //     Task n2 = new Task("T2", 10, dep);
+    //     Task n3 = new Task("T3", 10, null);
+    //     Task n4 = new Task("T4", 10, null);
+    //     LeftistHeap heap = new LeftistHeap();
+    //     heap.insert(n1);
+    //     heap.insert(n3);
+    //     // heap.insert(n4);
+    //     heap.insert(n2);
+    //     Task n5 = heap.extractMin();
+    //     Task n6 = heap.extractMin();
+    //     Task n7 = heap.extractMin();
+    // }   
 }
 
 // This should suffice for the priority queue.

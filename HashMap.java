@@ -82,7 +82,13 @@ public class HashMap {
     //     return s.hashCode() % HashArr.length;
     // }
     public int hash_func(String s){
-        return s.hashCode() % HashArr.length;
+        int hash = s.hashCode();
+        if (hash < 0){
+            return (hash * -1) % HashArr.length;
+        } else {
+            return s.hashCode() % HashArr.length;
+        }
+        
     }
     public void add(String key, Task s){
         int index = hash_func(key);

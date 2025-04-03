@@ -34,31 +34,52 @@ public class TaskPrioritizer {
      */
     public void add(String taskId, int urgencyLevel, String[] dependencies) {
         // TODO
-        Task n = new Task(taskId, urgencyLevel, dependencies);
+        LinkedList task = allNodes.getValues(taskId);
+        Task n; 
+        if (task == null){
+            n = new Task(taskId, urgencyLevel, dependencies);
+        } else {
+            Node c = task.head;
+            while(c != null){
+                Node next = c.next;
+                // Found in queue already
+                if(c.data.id.equals(taskId)){
+                    return;
+                } 
+                c = next;
+            }
+            n = new Task(taskId, urgencyLevel, dependencies);
+        }
+        
         
         if(dependencies.length == 0){
             queue.insert(n);
         } else{
             // Has dependenceis so add into HashMap.
             for(String s: dependencies){
-                LinkedList task = allNodes.getValues(s);
-                // Check to see if the task has already been resolved
-                Node curr = task.head;
-                while(curr != null){
-                    Node next = curr.next;
-                    if(curr.data.id.equals(s)){
-                        // Found the node in the bucket Now to check if resolved
-                        if(!curr.data.resolved){
-                            hasDependecies.add(s, n);
-                        } else {
-                            // resolved, no need to look further in this bucket
-                            n.dependencies.remove(s);
-                            if (n.dependencies.size()==0) queue.insert(n);
-                            break;
+                task = allNodes.getValues(s);
+                // Check if dependency has been added yet
+                if(task != null) {
+                    Node curr = task.head;
+                    // Check to see if the task has already been resolved
+                    while(curr != null){
+                        Node next = curr.next;
+                        if(curr.data.id.equals(s)){
+                            // Found the node in the bucket Now to check if resolved
+                            if(!curr.data.resolved){
+                                hasDependecies.add(s, n);
+                            } else {
+                                // resolved, no need to look further in this bucket
+                                n.dependencies.remove(s);
+                                if (n.dependencies.size()==0) queue.insert(n);
+                                break;
+                            }
                         }
-                    }
-                curr = next;
-            }
+                        curr = next;
+                    }    
+                }
+                
+                
                 
             }
         }
@@ -74,18 +95,27 @@ public class TaskPrioritizer {
      */
     public void update(String taskId, int newUrgencyLevel) {
         // TODO
-        // LinkedList vals = allNodes.getValues(taskId);
+        LinkedList vals = allNodes.getValues(taskId);
         // Task found = null;
-        // for(Task n: vals){
-        //     if(n.id.equals(taskId)){
-        //         found = n;
-        //     }
-        // }
-        // // Update its placement in the heap??
-        // //
-        // if (found != null)
-        //     queue.delete(found); 
-
+        Node c = vals.head;
+        while(c != null){
+            Node next = c.next;
+            // Found in queue already
+            if(c.data.id.equals(taskId)){
+                c.data.prioLvl = 0-newUrgencyLevel;
+                // Resolved, don't do anything further
+                if(c.data.resolved){
+                    return;
+                } else {
+                    // 
+                    if(c.data.dependencies.size() == 0){
+                        queue.delete(c.data);
+                        queue.insert(c.data);
+                    }
+                }
+            } 
+            c = next;
+        }
     }
 
     /**

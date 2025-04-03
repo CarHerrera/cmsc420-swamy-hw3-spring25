@@ -27,6 +27,7 @@ public class Task {
         return -this.prioLvl;
     }
     public int HashCode(){
-        return id.hashCode();
+        // Ensure positive hashcode
+        return id.hashCode() < 0 ? -1 * id.hashCode() : id.hashCode();
     }
 }
