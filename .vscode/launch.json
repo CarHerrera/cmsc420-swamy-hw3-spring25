@@ -4,8 +4,14 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
-
+        {
+            "type": "java",
+            "name": "Evaluator",
+            "request": "launch",
+            "mainClass": "Evaluator",
+            "projectName": "cmsc420-swamy-hw3-spring25_38a69b4e",
+            "args": "tests/05_small-indegree-bound-no-updates-small-range.txt"
+        },
         {
             "type": "java",
             "name": "Current File",
@@ -14,25 +20,18 @@
         },
         {
             "type": "java",
+            "name": "CuckooHash",
+            "request": "launch",
+            "mainClass": "CuckooHash",
+            "projectName": "cmsc420-swamy-hw3-spring25_336c0ce8"
+        },
+        {
+            "type": "java",
             "name": "Evaluator",
             "request": "launch",
             "mainClass": "Evaluator",
-            "projectName": "cmsc420-swamy-hw3-spring25_30183e74",
-            "args": "tests/same_vals.txt"
-        },
-        {
-            "type": "java",
-            "name": "HashMap",
-            "request": "launch",
-            "mainClass": "HashMap",
-            "projectName": "cmsc420-swamy-hw3-spring25_30183e74"
-        },
-        {
-            "type": "java",
-            "name": "LeftistHeap",
-            "request": "launch",
-            "mainClass": "LeftistHeap",
-            "projectName": "cmsc420-swamy-hw3-spring25_30183e74"
+            "projectName": "cmsc420-swamy-hw3-spring25_336c0ce8",
+            "args": "tests/base_test.txt"
         }
     ]
 }

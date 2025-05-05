@@ -1,6 +1,3 @@
-import java.lang.String;
-
-
 /**
  * TaskPrioritizer class that returns the most urgent
  * available task
@@ -11,18 +8,14 @@ public class TaskPrioritizer {
     /**
      * Constructor to initialize the TaskPrioritizer
      */
-    LeftistHeap queue;
-    HashMap hasDependecies;
-    HashMap allNodes;
+    private final StableHeap q;
+    private final CuckooHash<String,Task> allNodes;
+    private final CuckooHash<String, LinkedList> hasDependencies;
+    private final int SIZE = 501083;
     public TaskPrioritizer() {
-        // The queue with no dependencies
-        queue = new LeftistHeap();
-        // int size = 10;
-        int size = 11939;
-        // Hash map that has all the nodes with dependencies
-        hasDependecies = new HashMap(size);
-        // Hash map to easily find nodes
-        allNodes = new HashMap(size);
+        q = new StableHeap();
+        allNodes = new CuckooHash<>(SIZE);
+        hasDependencies = new CuckooHash<>(SIZE);
     }
 
     /**
@@ -34,56 +27,38 @@ public class TaskPrioritizer {
      */
     public void add(String taskId, int urgencyLevel, String[] dependencies) {
         // TODO
-        LinkedList task = allNodes.getValues(taskId);
-        Task n; 
-        if (task == null){
-            n = new Task(taskId, urgencyLevel, dependencies);
-        } else {
-            Node c = task.head;
-            while(c != null){
-                Node next = c.next;
-                // Found in queue already
-                if(c.data.id.equals(taskId)){
-                    return;
-                } 
-                c = next;
-            }
-            n = new Task(taskId, urgencyLevel, dependencies);
-        }
-        
-        
-        if(dependencies.length == 0){
-            queue.insert(n);
-        } else{
-            // Has dependenceis so add into HashMap.
-            for(String s: dependencies){
-                task = allNodes.getValues(s);
-                // Check if dependency has been added yet
-                if(task != null) {
-                    Node curr = task.head;
-                    // Check to see if the task has already been resolved
-                    while(curr != null){
-                        Node next = curr.next;
-                        if(curr.data.id.equals(s)){
-                            // Found the node in the bucket Now to check if resolved
-                            if(!curr.data.resolved){
-                                hasDependecies.add(s, n);
+        boolean in = allNodes.containsKey(taskId);
+        if(!in){
+            Task t = new Task(taskId, urgencyLevel, dependencies);
+            // Has no dependencies and does not exist. So add to heap
+            if(dependencies == null || dependencies.length == 0){
+                q.insert(t);
+            } else {
+                for(String s: dependencies){
+                    // Check if the dependency has been added overall
+                    Task tmp = allNodes.get(s);
+                   if(tmp != null) {
+                        if(tmp.resolved){
+                            t.dependencies.remove(tmp.id);
+                        } else {
+                            LinkedList l = hasDependencies.get(s);
+                            // Dependency for that node has not been created
+                            if(l == null){
+                            l = new LinkedList();
+                            l.add(t);
+                            hasDependencies.put(s, l); 
                             } else {
-                                // resolved, no need to look further in this bucket
-                                n.dependencies.remove(s);
-                                if (n.dependencies.size()==0) queue.insert(n);
-                                break;
+                            l.add(t);
                             }
                         }
-                        curr = next;
-                    }    
+                   }
                 }
-                
-                
-                
+                if(t.dependencies.isEmpty()){
+                    q.insert(t);
+                }
             }
+            allNodes.put(taskId, t);
         }
-        allNodes.add(taskId, n);
     }
 
     /**
@@ -94,27 +69,15 @@ public class TaskPrioritizer {
      * @param urgencyLevel The new integer urgencyLevel of the task
      */
     public void update(String taskId, int newUrgencyLevel) {
-        // TODO
-        LinkedList vals = allNodes.getValues(taskId);
-        // Task found = null;
-        Node c = vals.head;
-        while(c != null){
-            Node next = c.next;
-            // Found in queue already
-            if(c.data.id.equals(taskId)){
-                c.data.prioLvl = 0-newUrgencyLevel;
-                // Resolved, don't do anything further
-                if(c.data.resolved){
-                    return;
-                } else {
-                    // 
-                    if(c.data.dependencies.size() == 0){
-                        queue.delete(c.data);
-                        queue.insert(c.data);
-                    }
-                }
-            } 
-            c = next;
+        // // TODO
+        boolean in = allNodes.containsKey(taskId);
+        if(in){
+            Task t = allNodes.get(taskId);
+            if(t.resolved){
+                t.prioLvl = newUrgencyLevel;
+            } else {
+                q.updatePriority(t, newUrgencyLevel);
+            }
         }
     }
 
@@ -127,21 +90,25 @@ public class TaskPrioritizer {
      */
     public String resolve() {
         // TODO
-        Task max = queue.extractMin();
-        if (max == null) return null;
-        LinkedList dep = hasDependecies.getValues(max.id);
-        if (dep != null){
+
+        Task max = q.extractMax();
+        if (max == null){return null;}
+        LinkedList dep = hasDependencies.get(max.id);
+        if (dep != null && dep.count > 0){
             Node curr = dep.head;
             while(curr != null){
                 Node next = curr.next;
                 if(curr.data.dependencies.remove(max.id)){
-                    if(curr.data.dependencies.size() == 0) queue.insert(curr.data);
+                    if(curr.data.dependencies.isEmpty()) {
+                        q.insert(curr.data);
+                    }
                     dep.remove(curr);
                 }
                 curr = next;
-            }
-        }   
+            } 
+        }
         max.resolved = true;
         return max.id;
+    
     }
 }
